@@ -1,1 +1,7 @@
 nibabel
+nipype
+nilearn
+antspyx
+SimpleITK
+
+https://drive.google.com/open?id=1N1Qx-R5tLCX5EhXPoPdyg6YvEkDtf-cD&authuser=0
