@@ -151,7 +151,7 @@ print(train_data.shape)
 train_loader = tf.data.Dataset.from_tensor_slices((train_data))
 validation_loader = tf.data.Dataset.from_tensor_slices((val_data))
 
-batch_size = 10
+batch_size = 2
 # Augment the on the fly during training.
 train_dataset = (
     train_loader.shuffle(len(train_data))
