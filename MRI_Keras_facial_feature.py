@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import os
 import zipfile
 import numpy as np
@@ -8,6 +14,10 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 from scipy import ndimage
+
+
+# In[2]:
+
 
 def read_nifti_file(filepath):
     """Read and load volume"""
@@ -63,12 +73,20 @@ def process_scan(path):
     volume = resize_volume(volume)
     return volume
 
+
+# In[3]:
+
+
 scan_paths = [
     os.path.join(os.getcwd(), "../BET_BSE_DATA", x)
     for x in os.listdir("../BET_BSE_DATA")
 ]
 
 print("Brain scans: " + str(len(scan_paths)))
+
+
+# In[4]:
+
 
 import csv
  
@@ -101,6 +119,10 @@ with open(filename, 'r') as csvfile:
 # printing the field names
 print('Field names are:' + ', '.join(field for field in fields))
 #print(labels_dict)
+
+
+# In[5]:
+
 
 import random
 
@@ -139,25 +161,43 @@ def validation_preprocessing(volume, label):
     volume = tf.expand_dims(volume, axis=3)
     return volume, label
 
+
+# In[6]:
+
+
 # Read and process the scans.
 # Each scan is resized across height, width, and depth and rescaled.
 brain_scans=[]
 labels_facial_feature=[]
+labels_to_file=[]
 for path in os.listdir("/home/joelkik/DataMining/BET_BSE_DATA/files"):
     brain_scans.append(process_scan("/home/joelkik/DataMining/BET_BSE_DATA/files/"+path))
     labels_facial_feature.append(labels_dict[path])
+    labels_to_file.append(path)        
     
+
+
+# In[7]:
+
+
 brain_scans_np = np.array(brain_scans)
 labels_facial_feature_np = np.array(labels_facial_feature)
 
+
+# In[8]:
+
+
 from sklearn.model_selection import train_test_split
 x_train, x_val, y_train, y_val = train_test_split(brain_scans, labels_facial_feature, test_size=0.20, random_state=42)
+
+# In[9]:
+
 
 # Define data loaders.
 train_loader = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 validation_loader = tf.data.Dataset.from_tensor_slices((x_val, y_val))
 
-batch_size = 64
+batch_size = 2
 # Augment the on the fly during training.
 train_dataset = (
     train_loader.shuffle(len(x_train))
@@ -172,6 +212,7 @@ validation_dataset = (
     .batch(batch_size)
     .prefetch(2)
 )
+
 
 def get_model(width=128, height=128, depth=64):
     """Build a 3D convolutional neural network model."""
@@ -209,6 +250,16 @@ def get_model(width=128, height=128, depth=64):
 model = get_model(width=128, height=128, depth=64)
 model.summary()
 
+
+# In[12]:
+
+
+model.load_weights("/home/joelkik/DataMining/CPSC8650_Project/3d_brain_image_classification.h5")
+
+
+# In[15]:
+
+
 # Compile model.
 initial_learning_rate = 0.0001
 lr_schedule = keras.optimizers.schedules.ExponentialDecay(
@@ -222,9 +273,9 @@ model.compile(
 
 # Define callbacks.
 checkpoint_cb = keras.callbacks.ModelCheckpoint(
-    "3d_brain_image_classification.h5", save_best_only=True
+    "3d_brain_image_classification.h5", save_best_only=True, monitor='val_acc'
 )
-early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=15)
+early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=5)
 
 # Train the model, doing validation at the end of each epoch
 epochs = 100
@@ -236,3 +287,5 @@ model.fit(
     verbose=1,
     callbacks=[checkpoint_cb, early_stopping_cb],
 )
+
+

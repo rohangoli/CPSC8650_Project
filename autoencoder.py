@@ -305,7 +305,7 @@ checkpoint_cb = keras.callbacks.ModelCheckpoint(
 early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=15)
 
 # Train the model, doing validation at the end of each epoch
-epochs = 100
+epochs = 25
 model.fit(
     train_dataset,
     validation_data=validation_dataset,

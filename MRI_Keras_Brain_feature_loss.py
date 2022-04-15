@@ -221,9 +221,9 @@ model.compile(
 
 # Define callbacks.
 checkpoint_cb = keras.callbacks.ModelCheckpoint(
-    "3d_brain_feature_loss_model.h5", save_best_only=True
+    "3d_brain_feature_loss_model.h5", save_best_only=True, monitor='val_acc'
 )
-early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=15)
+early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=5)
 
 # Train the model, doing validation at the end of each epoch
 epochs = 100
