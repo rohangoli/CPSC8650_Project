@@ -5,4 +5,3 @@
 * autoencoder-2.py - training the model to reconstruct the facail features.
 * 3d_brain_feature_loss_model.h5 - trained model to classify if brain voxels are removed.
 * 3d_brain_image_classification.h5 - trained model to classify if facial feature is present.
-* predict_facial_feature_brain_feature_loss.ipynb
