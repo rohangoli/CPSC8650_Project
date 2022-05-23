@@ -139,73 +139,86 @@ def validation_preprocessing(volume):
 # with open('val_data.npy', 'wb') as f:
 #     np.save(f, val_data)
 
-train_data=np.load('train_data.npy')
-val_data=np.load('val_data.npy')
+train_data=np.load('trainY.npy')
+val_data=np.load('brain_scans_np.npy')
 print(train_data.shape)
 
-train_data=np.squeeze(train_data, axis=-1)
-val_data=np.squeeze(val_data, axis=-1)
-print(train_data.shape)
+# train_data=np.squeeze(train_data, axis=-1)
+# val_data=np.squeeze(val_data, axis=-1)
+# print(train_data.shape)
     
-# Define data loaders.
-train_loader = tf.data.Dataset.from_tensor_slices((train_data))
-validation_loader = tf.data.Dataset.from_tensor_slices((val_data))
+# # Define data loaders.
+# train_loader = tf.data.Dataset.from_tensor_slices((train_data))
+# validation_loader = tf.data.Dataset.from_tensor_slices((val_data))
 
-batch_size = 2
-# Augment the on the fly during training.
-train_dataset = (
-    train_loader.shuffle(len(train_data))
-    .map(train_preprocessing)
-    .batch(batch_size)
-    .prefetch(2)
-)
-# Only rescale.
-validation_dataset = (
-    validation_loader.shuffle(len(val_data))
-    .map(validation_preprocessing)
-    .batch(batch_size)
-    .prefetch(2)
-)
+# batch_size = 2
+# # Augment the on the fly during training.
+# train_dataset = (
+#     train_loader.shuffle(len(train_data))
+#     .map(train_preprocessing)
+#     .batch(batch_size)
+#     .prefetch(2)
+# )
+# # Only rescale.
+# validation_dataset = (
+#     validation_loader.shuffle(len(val_data))
+#     .map(validation_preprocessing)
+#     .batch(batch_size)
+#     .prefetch(2)
+# )
 
-## Auto-Encoder
+# ## Auto-Encoder
 
-Input_img = keras.Input(shape=(128, 128, 64,1))
+# Input_img = keras.Input(shape=(128, 128, 64,1))
                         
-x1 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(Input_img)
-x2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(x1)
-x2 = layers.MaxPool3D( (2, 2, 2))(x2)
-encoded = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(x2)
+# x1 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(Input_img)
+# x2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(x1)
+# x2 = layers.MaxPool3D( (2, 2, 2))(x2)
+# encoded = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(x2)
 
-# decoding architecture
-x3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(encoded)
-x3 = layers.UpSampling3D((2, 2, 2))(x3)
-x2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(x3)
-x1 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(x2)
-decoded = layers.Conv3D(3, (3, 3, 3), padding='same')(x1)
+# # decoding architecture
+# x3 = layers.Conv3D(64, (3, 3, 3), activation='relu', padding='same')(encoded)
+# x3 = layers.UpSampling3D((2, 2, 2))(x3)
+# x2 = layers.Conv3D(128, (3, 3, 3), activation='relu', padding='same')(x3)
+# x1 = layers.Conv3D(256, (3, 3, 3), activation='relu', padding='same')(x2)
+# decoded = layers.Conv3D(3, (3, 3, 3), padding='same')(x1)
 
-autoencoder = keras.Model(Input_img, decoded)
-autoencoder.compile(optimizer='adam', loss='mse')
+# autoencoder = keras.Model(Input_img, decoded)
+# autoencoder.compile(optimizer='adam', loss='mse')
 
-autoencoder.summary()
-print(Input_img.shape)
-sample = train_dataset.take(1)
-print(type(sample))
-print(list(sample)[0][0].shape)
-print(list(sample)[0][1].shape)
-
-
-# Define callbacks.
-checkpoint_cb = keras.callbacks.ModelCheckpoint(
-    "MRI_reconstruction.h5", save_best_only=True
-)
-early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_loss", patience=15)
+# autoencoder.summary()
+# print(Input_img.shape)
+# sample = train_dataset.take(1)
+# print(type(sample))
+# print(list(sample)[0][0].shape)
+# print(list(sample)[0][1].shape)
 
 
-autoencoder.fit(
-    train_dataset,
-    validation_data=validation_dataset,
-    epochs=1,
-    shuffle=True,
-    verbose=1,
-    callbacks=[checkpoint_cb, early_stopping_cb ],
-)
+# # Define callbacks.
+# checkpoint_cb = keras.callbacks.ModelCheckpoint(
+#     "MRI_reconstruction.h5", save_best_only=True
+# )
+# early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_loss", patience=15)
+
+
+# autoencoder.fit(
+#     train_dataset,
+#     validation_data=validation_dataset,
+#     epochs=1,
+#     shuffle=True,
+#     verbose=1,
+#     callbacks=[checkpoint_cb, early_stopping_cb ],
+# )
+
+model = keras.models.load_model("MRI_reconstruction.h5")
+
+train_paths = [ os.path.join("data/BET_BSE_DATA/files", x) for x in os.listdir("data/BET_BSE_DATA/files")]
+
+train_names = [ x.split('_')[0] for x in os.listdir("data/BET_BSE_DATA/files")]
+orig_scan_paths = [ os.path.join("/scratch1/rgoli/IXI-T1", x)+".nii.gz" for x in train_names]
+
+for i in range(1):
+    prediction = model.predict(np.expand_dims(val_data[i], axis=0))[0]
+    print(prediction.shape)
+    ni_img = nib.Nifti1Image(prediction, affine=np.eye(4))
+    nib.save(ni_img, "prediction.nii")

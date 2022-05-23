@@ -139,19 +139,19 @@ def validation_preprocessing(volume):
 # with open('val_data.npy', 'wb') as f:
 #     np.save(f, val_data)
 
-train_data=np.load('train_data.npy')
-val_data=np.load('val_data.npy')
+train_data=np.load('brain_scans_np.npy')
+val_data=np.load('trainY.npy')
 print(train_data.shape)
 
-train_data=np.squeeze(train_data, axis=-1)
-val_data=np.squeeze(val_data, axis=-1)
-print(train_data.shape)
+# train_data=np.squeeze(train_data, axis=-1)
+# val_data=np.squeeze(val_data, axis=-1)
+# print(train_data.shape)
     
 # Define data loaders.
 train_loader = tf.data.Dataset.from_tensor_slices((train_data))
 validation_loader = tf.data.Dataset.from_tensor_slices((val_data))
 
-batch_size = 10
+batch_size = 2
 # Augment the on the fly during training.
 train_dataset = (
     train_loader.shuffle(len(train_data))

@@ -1,0 +1,7 @@
+nohup: ignoring input
+2022-04-15 18:41:18.808972: W tensorflow/stream_executor/platform/default/dso_loader.cc:60] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /software/spackages/linux-centos8-x86_64/gcc-8.3.1/hadoop-3.2.1-lux74iyfcxxzatxh4em67xezesi4z4i4/lib:/software/spackages/linux-centos8-x86_64/gcc-8.3.1/openjdk-1.8.0_222-b10-ui6ldtk7sly7izptgo3yptahiqabz4fd/lib:/software/spackages/linux-centos8-x86_64/gcc-8.3.1/libxml2-2.9.10-mfobbkw2olvwmlhdwdptm5acrqc5uit6/lib:/software/spackages/linux-centos8-x86_64/gcc-8.3.1/anaconda3-5.1.0-c3p5et4cpo7jaiahacqa3pqwhop7tiik/lib:/software/spackages/linux-centos8-x86_64/gcc-8.3.1/anaconda3-2021.05-5tjen3mrle3pnguoedh4n2stzzsmywn7/lib
+2022-04-15 18:41:18.809000: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+Traceback (most recent call last):
+  File "mri_reconstruct_v2.py", line 6, in <module>
+    import nibabel as nib
+ModuleNotFoundError: No module named 'nibabel'

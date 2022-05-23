@@ -64,8 +64,8 @@ def process_scan(path):
     return volume
 
 scan_paths = [
-    os.path.join(os.getcwd(), "../BET_BSE_DATA", x)
-    for x in os.listdir("../BET_BSE_DATA")
+    os.path.join(os.getcwd(), "data/BET_BSE_DATA/files", x)
+    for x in os.listdir("data/BET_BSE_DATA/files")
 ]
 
 print("Brain scans: " + str(len(scan_paths)))
@@ -73,7 +73,7 @@ print("Brain scans: " + str(len(scan_paths)))
 import csv
  
 # csv file name
-filename = "/home/joelkik/DataMining/BET_BSE_DATA/Label_file.csv"
+filename = "data/BET_BSE_DATA/Label_file.csv"
  
 # initializing the titles and rows list
 fields = []
@@ -143,8 +143,8 @@ def validation_preprocessing(volume, label):
 # Each scan is resized across height, width, and depth and rescaled.
 brain_scans=[]
 labels_facial_feature=[]
-for path in os.listdir("/home/joelkik/DataMining/BET_BSE_DATA/files"):
-    brain_scans.append(process_scan("/home/joelkik/DataMining/BET_BSE_DATA/files/"+path))
+for path in os.listdir("data/BET_BSE_DATA/files"):
+    brain_scans.append(process_scan("data/BET_BSE_DATA/files/"+path))
     labels_facial_feature.append(labels_dict[path])
     
 brain_scans_np = np.array(brain_scans)
@@ -227,7 +227,7 @@ checkpoint_cb = keras.callbacks.ModelCheckpoint(
 early_stopping_cb = keras.callbacks.EarlyStopping(monitor="val_acc", patience=15)
 
 # Train the model, doing validation at the end of each epoch
-epochs = 100
+epochs = 1
 model.fit(
     train_dataset,
     validation_data=validation_dataset,
